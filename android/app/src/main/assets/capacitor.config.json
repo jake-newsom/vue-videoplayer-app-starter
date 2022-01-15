@@ -1,0 +1,6 @@
+{
+	"appId": "io.ionic.starter",
+	"appName": "vue-videoplayer-app-starter",
+	"webDir": "dist",
+	"bundledWebRuntime": false
+}
