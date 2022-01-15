@@ -1,0 +1,7 @@
+{
+  "name": "vue-videoplayer-app-starter",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}
