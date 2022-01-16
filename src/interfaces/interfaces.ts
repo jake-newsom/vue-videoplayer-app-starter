@@ -13,6 +13,6 @@ export interface VideoModel {
     published_at: string,
     subtitle_url?: string,
     subtitle_langage?: string,
-    subtitle_options?: SubtitleOptions
+    subtitle_options?: any
 
 }

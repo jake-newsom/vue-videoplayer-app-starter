@@ -12,11 +12,11 @@ interface PlayerData {
     url: string,
     playerId: string,
     componentTag: string, 
-    width?: number,
-    height?: number,
-    subtitle?: string,
-    language?: string,
-    subtitleOptions?: any
+    width?: number | null,
+    height?: number | null,
+    subtitle?: string | null,
+    language?: string | null,
+    subtitleOptions?: any | null
 }
 
 export type VideoPlayerProps = {
@@ -147,20 +147,23 @@ export function useVideoPlayer(onVPEvents?: VideoPlayerProps): VideoPlayerHook {
      */
     const initPlayer = async (mode: string, url : string,
         playerId: string, componentTag: string,
-        subTitleUrl?: string, subTitleLangage?: string, subTitleOptions?: any,
-        width?: number, height?: number) => {
+        subTitleUrl?: string , subTitleLangage?: string, subTitleOptions?: any) => {
         const playerData: PlayerData = {mode: mode, url: url, 
             playerId: playerId, componentTag: componentTag}
-        if(subTitleUrl && subTitleLangage) {
-            playerData.subtitle = subTitleUrl;
-            playerData.language = subTitleLangage;
+        playerData.subtitle = subTitleUrl != null ? subTitleUrl : null; 
+        playerData.language = subTitleLangage != null ? subTitleLangage : null;
+        if(subTitleOptions != null) {
+            playerData.subtitleOptions = {};
+            if(subTitleOptions.backgroundColor != null)
+                playerData.subtitleOptions.backgroundColor = subTitleOptions.backgroundColor;
+            if(subTitleOptions.fontSize != null)
+                playerData.subtitleOptions.fontSize = subTitleOptions.fontSize;
+            if(subTitleOptions.foregroundColor != null)
+                playerData.subtitleOptions.foregroundColor = subTitleOptions.foregroundColor;
+            
+        } else {
+            playerData.subtitleOptions = null;
         }
-        if(subTitleOptions) playerData.subtitleOptions = subTitleOptions;
-        if(width && height) {
-            playerData.width = width;
-            playerData.height = height;
-        }
-        console.log(`>>>> ${JSON.stringify(playerData)}`)
         const r = await vpPlugin.initPlayer(playerData);
         if (r) {
             if( typeof r.result != 'undefined') {

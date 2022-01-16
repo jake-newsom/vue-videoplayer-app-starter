@@ -67,6 +67,7 @@ import ApiService from '../services/api.services';
 import { useVideoPlayer ,VideoPlayerHook, VideoPlayerProps, VideoPlayerOuput } from '../composables/videoplayer';
 import { playCircleOutline } from "ionicons/icons";
 import FullscreenVideoPlayer from '@/components/FullscreenVideoPlayer.vue';
+import { useState } from '@/composables/state';
 
 export default defineComponent({
   name: 'ViewVideo',
@@ -90,10 +91,12 @@ export default defineComponent({
   setup () {
     const apiService = new ApiService();
     const onVPEvents: VideoPlayerProps = {} as VideoPlayerProps;
+    const [isClicked, setIsClicked] = useState(false);
+
     const playerLeave = async () => {
       await vpHook.removeListeners();
-      const ret: VideoPlayerOuput = await vpHook.stopAllPlayers();
-      if(!ret.result) console.log(`Error: ${ret.message}`)
+      await vpHook.stopAllPlayers();
+      setIsClicked(false);
     }
     onVPEvents.onPlay = async (fromPlayerId: string, currentTime: number | undefined) => {
         console.log(`<<<< onPlay in ViewVideo ${fromPlayerId} ct: ${currentTime}`);
@@ -116,10 +119,8 @@ export default defineComponent({
     const route = useRoute();
     const content = ref({} as VideoModel);
     const contentId  = ref(route.params.contentId);
-    const isClicked = ref(false);
     const getContent = async () => {
         const response = await apiService.get(contentId);
-        console.log(`response ${JSON.stringify(response)}`)
         if ("content" in response) {
             content.value = response.content;
         } else {
@@ -128,16 +129,9 @@ export default defineComponent({
     }
     onMounted(async () => {
         await getContent();
-        console.log(`content.value ${JSON.stringify(content.value)}`)
-        console.log(`content.value.title ${content.value.title}`)
-        console.log(`content.value.published_at ${content.value.published_at}`)
-        console.log(`content.value.url ${content.value.url}`)
-       console.log(`content.value.subtitle_url ${content.value.subtitle_url}`)
-       console.log(`content.value.subtitle_langage ${content.value.subtitle_langage}`)
-       console.log(`content.value.subtitle_options ${content.value.subtitle_options}`)
     });
 
-    return {getContent, content, vpHook, playCircleOutline, isClicked};
+    return {getContent, content, vpHook, playCircleOutline, isClicked, setIsClicked};
   },
   computed: {
     prettyPublishedAt() {
@@ -154,7 +148,7 @@ export default defineComponent({
   methods: {
 
     async playVideo() {
-        this.isClicked = true;
+        this.setIsClicked(true);
     },
     async doRefresh(event: { target: { complete: () => void; }; }) {
       await this.getContent();
